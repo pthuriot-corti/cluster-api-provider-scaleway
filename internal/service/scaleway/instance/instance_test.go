@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
-	"github.com/scaleway/cluster-api-provider-scaleway/api/v1alpha1"
+	infrav1 "github.com/scaleway/cluster-api-provider-scaleway/api/v1alpha1"
 	"github.com/scaleway/cluster-api-provider-scaleway/internal/scope"
 	"github.com/scaleway/cluster-api-provider-scaleway/internal/service/scaleway/client"
 	"github.com/scaleway/cluster-api-provider-scaleway/internal/service/scaleway/client/mock_client"
@@ -21,9 +21,9 @@ import (
 	"github.com/scaleway/scaleway-sdk-go/scw"
 	"go.uber.org/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/cluster-api/api/v1beta1"
+	"k8s.io/utils/ptr"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
@@ -77,53 +77,53 @@ func TestService_Reconcile(t *testing.T) {
 			name: "create control-plane machine",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &v1beta1.Machine{
-						ObjectMeta: v1.ObjectMeta{
+					Machine: &clusterv1.Machine{
+						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 							Labels:    map[string]string{clusterv1.MachineControlPlaneLabel: ""},
 						},
-						Spec: v1beta1.MachineSpec{
+						Spec: clusterv1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
 							Bootstrap: clusterv1.Bootstrap{
 								DataSecretName: scw.StringPtr("bootstrap"),
 							},
 						},
 					},
-					ScalewayMachine: &v1alpha1.ScalewayMachine{
-						ObjectMeta: v1.ObjectMeta{
+					ScalewayMachine: &infrav1.ScalewayMachine{
+						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: v1alpha1.ScalewayMachineSpec{
+						Spec: infrav1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: v1alpha1.ImageSpec{
+							Image: infrav1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							PublicNetwork: &v1alpha1.PublicNetworkSpec{
+							PublicNetwork: &infrav1.PublicNetworkSpec{
 								EnableIPv4: scw.BoolPtr(true),
 								EnableIPv6: scw.BoolPtr(true),
 							},
-							RootVolume: &v1alpha1.RootVolumeSpec{
+							RootVolume: &infrav1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &v1alpha1.ScalewayCluster{
-							ObjectMeta: v1.ObjectMeta{
+						ScalewayCluster: &infrav1.ScalewayCluster{
+							ObjectMeta: metav1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: v1alpha1.ScalewayClusterSpec{
-								Network: &v1alpha1.NetworkSpec{
-									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
+							Spec: infrav1.ScalewayClusterSpec{
+								Network: &infrav1.NetworkSpec{
+									PrivateNetwork: &infrav1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: v1alpha1.ScalewayClusterStatus{
-								Network: &v1alpha1.NetworkStatus{
+							Status: infrav1.ScalewayClusterStatus{
+								Network: &infrav1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -136,7 +136,7 @@ func TestService_Reconcile(t *testing.T) {
 			},
 			objects: []runtime.Object{
 				&corev1.Secret{
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "bootstrap",
 						Namespace: "default",
 					},
@@ -242,7 +242,7 @@ func TestService_Reconcile(t *testing.T) {
 							Namespace: "default",
 						},
 						Spec: clusterv1.MachineSpec{
-							FailureDomain: "fr-par-1",
+							FailureDomain: scw.StringPtr("fr-par-1"),
 							Bootstrap: clusterv1.Bootstrap{
 								DataSecretName: ptr.To("bootstrap"),
 							},
@@ -255,18 +255,16 @@ func TestService_Reconcile(t *testing.T) {
 						},
 						Spec: infrav1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.Image{
-								IDOrName: infrav1.IDOrName{
-									ID: imageID,
-								},
+							Image: infrav1.ImageSpec{
+								ID: scw.StringPtr(imageID),
 							},
-							RootVolume: infrav1.RootVolume{
-								Size: 42,
+							RootVolume: &infrav1.RootVolumeSpec{
+								Size: scw.Int64Ptr(42),
 							},
 							AdditionalVolumes: []infrav1.AdditionalVolume{
-								{Type: "block", Size: 20, IOPS: 5000},
-								{Type: "local", Size: 10},
-								{Type: "scratch", Size: 50},
+								{Type: scw.StringPtr("block"), Size: scw.Int64Ptr(20), IOPS: scw.Int64Ptr(5000)},
+								{Type: scw.StringPtr("local"), Size: scw.Int64Ptr(10)},
+								{Type: scw.StringPtr("scratch"), Size: scw.Int64Ptr(50)},
 							},
 						},
 					},
@@ -277,15 +275,15 @@ func TestService_Reconcile(t *testing.T) {
 								Namespace: "default",
 							},
 							Spec: infrav1.ScalewayClusterSpec{
-								Network: infrav1.ScalewayClusterNetwork{
-									PrivateNetwork: infrav1.PrivateNetworkSpec{
-										Enabled: ptr.To(true),
+								Network: &infrav1.NetworkSpec{
+									PrivateNetwork: &infrav1.PrivateNetworkSpec{
+										Enabled: true,
 									},
 								},
 							},
 							Status: infrav1.ScalewayClusterStatus{
-								Network: infrav1.ScalewayClusterNetworkStatus{
-									PrivateNetworkID: privateNetworkID,
+								Network: &infrav1.NetworkStatus{
+									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
 						},
@@ -310,7 +308,7 @@ func TestService_Reconcile(t *testing.T) {
 				clusterTags := []string{"caps-namespace=default", "caps-scalewaycluster=cluster"}
 				tags := append(clusterTags, "caps-scalewaymachine=machine")
 
-				i.GetZoneOrDefault("fr-par-1").Return(scw.ZoneFrPar1, nil)
+				i.GetZoneOrDefault(scw.StringPtr("fr-par-1")).Return(scw.ZoneFrPar1, nil)
 				i.FindServer(gomock.Any(), scw.ZoneFrPar1, tags).Return(nil, client.ErrNoItemFound)
 				i.CreateServer(
 					gomock.Any(),
@@ -355,7 +353,7 @@ func TestService_Reconcile(t *testing.T) {
 				}, nil)
 
 				// LB: worker node, so no backend or ACL changes.
-				i.GetZoneOrDefault("").Return(scw.ZoneFrPar1, nil)
+				i.GetZoneOrDefault(nil).Return(scw.ZoneFrPar1, nil)
 				i.FindLB(gomock.Any(), scw.ZoneFrPar1, append(clusterTags, servicelb.CAPSMainLBTag)).Return(&lb.LB{
 					ID:   lbID,
 					Zone: scw.ZoneFrPar1,
@@ -374,20 +372,20 @@ func TestService_Reconcile(t *testing.T) {
 				i.ServerAction(gomock.Any(), scw.ZoneFrPar1, serverID, instance.ServerActionPoweron)
 			},
 			asserts: func(g *WithT, m *scope.Machine) {
-				g.Expect(m.ScalewayMachine.Spec.ProviderID).To(Equal("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111"))
+				g.Expect(m.ScalewayMachine.Spec.ProviderID).To(Equal(scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111")))
 			},
 		},
 		{
 			name: "node has joined cluster: need to clean userdata",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &v1beta1.Machine{
-						ObjectMeta: v1.ObjectMeta{
+					Machine: &clusterv1.Machine{
+						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 							Labels:    map[string]string{clusterv1.MachineControlPlaneLabel: ""},
 						},
-						Spec: v1beta1.MachineSpec{
+						Spec: clusterv1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
 							Bootstrap: clusterv1.Bootstrap{
 								DataSecretName: scw.StringPtr("bootstrap"),
@@ -399,41 +397,41 @@ func TestService_Reconcile(t *testing.T) {
 							},
 						},
 					},
-					ScalewayMachine: &v1alpha1.ScalewayMachine{
-						ObjectMeta: v1.ObjectMeta{
+					ScalewayMachine: &infrav1.ScalewayMachine{
+						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: v1alpha1.ScalewayMachineSpec{
+						Spec: infrav1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: v1alpha1.ImageSpec{
+							Image: infrav1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							PublicNetwork: &v1alpha1.PublicNetworkSpec{
+							PublicNetwork: &infrav1.PublicNetworkSpec{
 								EnableIPv4: scw.BoolPtr(true),
 								EnableIPv6: scw.BoolPtr(true),
 							},
-							RootVolume: &v1alpha1.RootVolumeSpec{
+							RootVolume: &infrav1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
 							ProviderID: scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111"),
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &v1alpha1.ScalewayCluster{
-							ObjectMeta: v1.ObjectMeta{
+						ScalewayCluster: &infrav1.ScalewayCluster{
+							ObjectMeta: metav1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: v1alpha1.ScalewayClusterSpec{
-								Network: &v1alpha1.NetworkSpec{
-									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
+							Spec: infrav1.ScalewayClusterSpec{
+								Network: &infrav1.NetworkSpec{
+									PrivateNetwork: &infrav1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: v1alpha1.ScalewayClusterStatus{
-								Network: &v1alpha1.NetworkStatus{
+							Status: infrav1.ScalewayClusterStatus{
+								Network: &infrav1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -532,13 +530,13 @@ func TestService_Delete(t *testing.T) {
 			name: "delete control-plane machine",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &v1beta1.Machine{
-						ObjectMeta: v1.ObjectMeta{
+					Machine: &clusterv1.Machine{
+						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 							Labels:    map[string]string{clusterv1.MachineControlPlaneLabel: ""},
 						},
-						Spec: v1beta1.MachineSpec{
+						Spec: clusterv1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
 							Bootstrap: clusterv1.Bootstrap{
 								DataSecretName: scw.StringPtr("bootstrap"),
@@ -550,41 +548,41 @@ func TestService_Delete(t *testing.T) {
 							},
 						},
 					},
-					ScalewayMachine: &v1alpha1.ScalewayMachine{
-						ObjectMeta: v1.ObjectMeta{
+					ScalewayMachine: &infrav1.ScalewayMachine{
+						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: v1alpha1.ScalewayMachineSpec{
+						Spec: infrav1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: v1alpha1.ImageSpec{
+							Image: infrav1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							PublicNetwork: &v1alpha1.PublicNetworkSpec{
+							PublicNetwork: &infrav1.PublicNetworkSpec{
 								EnableIPv4: scw.BoolPtr(true),
 								EnableIPv6: scw.BoolPtr(true),
 							},
-							RootVolume: &v1alpha1.RootVolumeSpec{
+							RootVolume: &infrav1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
 							ProviderID: scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111"),
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &v1alpha1.ScalewayCluster{
-							ObjectMeta: v1.ObjectMeta{
+						ScalewayCluster: &infrav1.ScalewayCluster{
+							ObjectMeta: metav1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: v1alpha1.ScalewayClusterSpec{
-								Network: &v1alpha1.NetworkSpec{
-									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
+							Spec: infrav1.ScalewayClusterSpec{
+								Network: &infrav1.NetworkSpec{
+									PrivateNetwork: &infrav1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: v1alpha1.ScalewayClusterStatus{
-								Network: &v1alpha1.NetworkStatus{
+							Status: infrav1.ScalewayClusterStatus{
+								Network: &infrav1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -682,7 +680,7 @@ func TestService_Delete(t *testing.T) {
 							Namespace: "default",
 						},
 						Spec: clusterv1.MachineSpec{
-							FailureDomain: "fr-par-1",
+							FailureDomain: scw.StringPtr("fr-par-1"),
 						},
 					},
 					ScalewayMachine: &infrav1.ScalewayMachine{
@@ -692,20 +690,18 @@ func TestService_Delete(t *testing.T) {
 						},
 						Spec: infrav1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.Image{
-								IDOrName: infrav1.IDOrName{
-									ID: imageID,
-								},
+							Image: infrav1.ImageSpec{
+								ID: scw.StringPtr(imageID),
 							},
-							RootVolume: infrav1.RootVolume{
-								Type: "local",
-								Size: 42,
+							RootVolume: &infrav1.RootVolumeSpec{
+								Type: scw.StringPtr("local"),
+								Size: scw.Int64Ptr(42),
 							},
 							AdditionalVolumes: []infrav1.AdditionalVolume{
-								{Type: "block", Size: 20, IOPS: 5000},
-								{Type: "local", Size: 10},
+								{Type: scw.StringPtr("block"), Size: scw.Int64Ptr(20), IOPS: scw.Int64Ptr(5000)},
+								{Type: scw.StringPtr("local"), Size: scw.Int64Ptr(10)},
 							},
-							ProviderID: "scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111",
+							ProviderID: scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111"),
 						},
 					},
 					Cluster: &scope.Cluster{
@@ -725,7 +721,7 @@ func TestService_Delete(t *testing.T) {
 				clusterTags := []string{"caps-namespace=default", "caps-scalewaycluster=cluster"}
 				tags := append(clusterTags, "caps-scalewaymachine=machine")
 
-				i.GetZoneOrDefault("fr-par-1").Return(scw.ZoneFrPar1, nil)
+				i.GetZoneOrDefault(scw.StringPtr("fr-par-1")).Return(scw.ZoneFrPar1, nil)
 				i.FindServer(gomock.Any(), scw.ZoneFrPar1, tags).Return(&instance.Server{
 					Name:  "machine",
 					ID:    serverID,
@@ -749,7 +745,7 @@ func TestService_Delete(t *testing.T) {
 				}, nil)
 
 				// No LB found (filtered).
-				i.GetZoneOrDefault("").Return(scw.ZoneFrPar1, nil)
+				i.GetZoneOrDefault(nil).Return(scw.ZoneFrPar1, nil)
 				i.FindLB(gomock.Any(), scw.ZoneFrPar1, append(clusterTags, servicelb.CAPSMainLBTag)).Return(nil, client.ErrNoItemFound)
 
 				// No public IPs to clean up.

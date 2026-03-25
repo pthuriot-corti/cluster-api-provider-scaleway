@@ -246,8 +246,8 @@ func (s *Service) ensureServer(ctx context.Context) (*instance.Server, error) {
 
 	var scratchVolumeSizes []scw.Size
 	for _, vol := range s.ScalewayMachine.Spec.AdditionalVolumes {
-		if vol.Type == scratchVolumeType {
-			scratchVolumeSizes = append(scratchVolumeSizes, scw.Size(vol.Size)*scw.GB)
+		if vol.Type != nil && *vol.Type == scratchVolumeType {
+			scratchVolumeSizes = append(scratchVolumeSizes, scw.Size(*vol.Size)*scw.GB)
 		}
 	}
 
@@ -329,18 +329,22 @@ func (s *Service) ensureAdditionalVolumes(ctx context.Context, server *instance.
 	)
 
 	for i, vol := range s.ScalewayMachine.Spec.AdditionalVolumes {
-		if vol.Type == scratchVolumeType {
+		if vol.Type != nil && *vol.Type == scratchVolumeType {
 			// Scratch volumes are automatically created with the instance, so we don't need to do anything here.
 			continue
 		}
 
 		volName := fmt.Sprintf("%s-%d", s.ResourceName(), i)
 		volSize := scw.GB
-		if vol.Size != 0 {
-			volSize = scw.Size(vol.Size) * scw.GB
+		if vol.Size != nil && *vol.Size != 0 {
+			volSize = scw.Size(*vol.Size) * scw.GB
 		}
 
-		switch vol.Type {
+		volType := "local"
+		if vol.Type != nil {
+			volType = *vol.Type
+		}
+		switch volType {
 		case "local":
 			if instanceVolumesByName == nil {
 				instanceVolumes, err := s.ScalewayClient.FindInstanceVolumes(ctx, server.Zone, s.ResourceTags())
@@ -381,7 +385,11 @@ func (s *Service) ensureAdditionalVolumes(ctx context.Context, server *instance.
 			}
 
 			if _, ok := blockVolumesByName[volName]; !ok {
-				volume, err := s.ScalewayClient.CreateVolume(ctx, server.Zone, volName, volSize, vol.IOPS, s.ResourceTags())
+				var iops int64
+				if vol.IOPS != nil {
+					iops = *vol.IOPS
+				}
+				volume, err := s.ScalewayClient.CreateVolume(ctx, server.Zone, volName, volSize, iops, s.ResourceTags())
 				if err != nil {
 					return fmt.Errorf("failed to create block volume: %w", err)
 				}
@@ -398,7 +406,7 @@ func (s *Service) ensureAdditionalVolumes(ctx context.Context, server *instance.
 				}
 			}
 		default:
-			return fmt.Errorf("unsupported additional volume type: %s", vol.Type)
+			return fmt.Errorf("unsupported additional volume type: %s", volType)
 		}
 	}
 
