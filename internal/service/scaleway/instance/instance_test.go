@@ -21,7 +21,7 @@ import (
 	"github.com/scaleway/scaleway-sdk-go/scw"
 	"go.uber.org/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/cluster-api/api/v1beta1"
@@ -78,7 +78,7 @@ func TestService_Reconcile(t *testing.T) {
 			fields: fields{
 				Machine: &scope.Machine{
 					Machine: &v1beta1.Machine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 							Labels:    map[string]string{v1beta1.MachineControlPlaneLabel: ""},
@@ -91,7 +91,7 @@ func TestService_Reconcile(t *testing.T) {
 						},
 					},
 					ScalewayMachine: &infrav1.ScalewayMachine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -111,7 +111,7 @@ func TestService_Reconcile(t *testing.T) {
 					},
 					Cluster: &scope.Cluster{
 						ScalewayCluster: &infrav1.ScalewayCluster{
-							ObjectMeta: metav1.ObjectMeta{
+							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
@@ -136,7 +136,7 @@ func TestService_Reconcile(t *testing.T) {
 			},
 			objects: []runtime.Object{
 				&corev1.Secret{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: v1.ObjectMeta{
 						Name:      "bootstrap",
 						Namespace: "default",
 					},
@@ -237,7 +237,7 @@ func TestService_Reconcile(t *testing.T) {
 			fields: fields{
 				Machine: &scope.Machine{
 					Machine: &v1beta1.Machine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -249,7 +249,7 @@ func TestService_Reconcile(t *testing.T) {
 						},
 					},
 					ScalewayMachine: &infrav1.ScalewayMachine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -270,7 +270,7 @@ func TestService_Reconcile(t *testing.T) {
 					},
 					Cluster: &scope.Cluster{
 						ScalewayCluster: &infrav1.ScalewayCluster{
-							ObjectMeta: metav1.ObjectMeta{
+							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
@@ -295,7 +295,7 @@ func TestService_Reconcile(t *testing.T) {
 			},
 			objects: []runtime.Object{
 				&corev1.Secret{
-					ObjectMeta: metav1.ObjectMeta{
+					ObjectMeta: v1.ObjectMeta{
 						Name:      "bootstrap",
 						Namespace: "default",
 					},
@@ -380,7 +380,7 @@ func TestService_Reconcile(t *testing.T) {
 			fields: fields{
 				Machine: &scope.Machine{
 					Machine: &v1beta1.Machine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 							Labels:    map[string]string{v1beta1.MachineControlPlaneLabel: ""},
@@ -398,7 +398,7 @@ func TestService_Reconcile(t *testing.T) {
 						},
 					},
 					ScalewayMachine: &infrav1.ScalewayMachine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -419,7 +419,7 @@ func TestService_Reconcile(t *testing.T) {
 					},
 					Cluster: &scope.Cluster{
 						ScalewayCluster: &infrav1.ScalewayCluster{
-							ObjectMeta: metav1.ObjectMeta{
+							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
@@ -531,7 +531,7 @@ func TestService_Delete(t *testing.T) {
 			fields: fields{
 				Machine: &scope.Machine{
 					Machine: &v1beta1.Machine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 							Labels:    map[string]string{v1beta1.MachineControlPlaneLabel: ""},
@@ -549,7 +549,7 @@ func TestService_Delete(t *testing.T) {
 						},
 					},
 					ScalewayMachine: &infrav1.ScalewayMachine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -570,7 +570,7 @@ func TestService_Delete(t *testing.T) {
 					},
 					Cluster: &scope.Cluster{
 						ScalewayCluster: &infrav1.ScalewayCluster{
-							ObjectMeta: metav1.ObjectMeta{
+							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
@@ -675,7 +675,7 @@ func TestService_Delete(t *testing.T) {
 			fields: fields{
 				Machine: &scope.Machine{
 					Machine: &v1beta1.Machine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -684,7 +684,7 @@ func TestService_Delete(t *testing.T) {
 						},
 					},
 					ScalewayMachine: &infrav1.ScalewayMachine{
-						ObjectMeta: metav1.ObjectMeta{
+						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
@@ -706,7 +706,7 @@ func TestService_Delete(t *testing.T) {
 					},
 					Cluster: &scope.Cluster{
 						ScalewayCluster: &infrav1.ScalewayCluster{
-							ObjectMeta: metav1.ObjectMeta{
+							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
