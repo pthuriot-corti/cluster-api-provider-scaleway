@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/utils/ptr"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	"sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 )
 
@@ -77,15 +77,15 @@ func TestService_Reconcile(t *testing.T) {
 			name: "create control-plane machine",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &clusterv1.Machine{
+					Machine: &v1beta1.Machine{
 						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
-							Labels:    map[string]string{clusterv1.MachineControlPlaneLabel: ""},
+							Labels:    map[string]string{v1beta1.MachineControlPlaneLabel: ""},
 						},
-						Spec: clusterv1.MachineSpec{
+						Spec: v1beta1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
-							Bootstrap: clusterv1.Bootstrap{
+							Bootstrap: v1beta1.Bootstrap{
 								DataSecretName: scw.StringPtr("bootstrap"),
 							},
 						},
@@ -222,12 +222,12 @@ func TestService_Reconcile(t *testing.T) {
 				i.ServerAction(gomock.Any(), scw.ZoneFrPar1, serverID, instance.ServerActionPoweron)
 			},
 			asserts: func(g *WithT, m *scope.Machine) {
-				g.Expect(m.ScalewayMachine.Status.Addresses).To(Equal([]clusterv1.MachineAddress{
-					{Type: clusterv1.MachineHostName, Address: "machine"},
-					{Type: clusterv1.MachineExternalIP, Address: "42.42.42.42"},
-					{Type: clusterv1.MachineExternalIP, Address: "2a00::2a"},
-					{Type: clusterv1.MachineExternalDNS, Address: "11111111-1111-1111-1111-111111111111.pub.instances.scw.cloud"},
-					{Type: clusterv1.MachineInternalIP, Address: "10.0.0.1"},
+				g.Expect(m.ScalewayMachine.Status.Addresses).To(Equal([]v1beta1.MachineAddress{
+					{Type: v1beta1.MachineHostName, Address: "machine"},
+					{Type: v1beta1.MachineExternalIP, Address: "42.42.42.42"},
+					{Type: v1beta1.MachineExternalIP, Address: "2a00::2a"},
+					{Type: v1beta1.MachineExternalDNS, Address: "11111111-1111-1111-1111-111111111111.pub.instances.scw.cloud"},
+					{Type: v1beta1.MachineInternalIP, Address: "10.0.0.1"},
 				}))
 				g.Expect(m.ScalewayMachine.Spec.ProviderID).To(Equal(scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111")))
 			},
@@ -236,14 +236,14 @@ func TestService_Reconcile(t *testing.T) {
 			name: "create machine with additional block, local and scratch volumes",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &clusterv1.Machine{
+					Machine: &v1beta1.Machine{
 						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: clusterv1.MachineSpec{
+						Spec: v1beta1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
-							Bootstrap: clusterv1.Bootstrap{
+							Bootstrap: v1beta1.Bootstrap{
 								DataSecretName: ptr.To("bootstrap"),
 							},
 						},
@@ -379,19 +379,19 @@ func TestService_Reconcile(t *testing.T) {
 			name: "node has joined cluster: need to clean userdata",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &clusterv1.Machine{
+					Machine: &v1beta1.Machine{
 						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
-							Labels:    map[string]string{clusterv1.MachineControlPlaneLabel: ""},
+							Labels:    map[string]string{v1beta1.MachineControlPlaneLabel: ""},
 						},
-						Spec: clusterv1.MachineSpec{
+						Spec: v1beta1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
-							Bootstrap: clusterv1.Bootstrap{
+							Bootstrap: v1beta1.Bootstrap{
 								DataSecretName: scw.StringPtr("bootstrap"),
 							},
 						},
-						Status: clusterv1.MachineStatus{
+						Status: v1beta1.MachineStatus{
 							NodeRef: &corev1.ObjectReference{
 								Name: "cluster",
 							},
@@ -511,8 +511,8 @@ func TestService_Delete(t *testing.T) {
 			name: "invalid zone, do nothing",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &clusterv1.Machine{
-						Spec: clusterv1.MachineSpec{
+					Machine: &v1beta1.Machine{
+						Spec: v1beta1.MachineSpec{
 							FailureDomain: scw.StringPtr("invalidvalue"),
 						},
 					},
@@ -530,19 +530,19 @@ func TestService_Delete(t *testing.T) {
 			name: "delete control-plane machine",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &clusterv1.Machine{
+					Machine: &v1beta1.Machine{
 						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
-							Labels:    map[string]string{clusterv1.MachineControlPlaneLabel: ""},
+							Labels:    map[string]string{v1beta1.MachineControlPlaneLabel: ""},
 						},
-						Spec: clusterv1.MachineSpec{
+						Spec: v1beta1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
-							Bootstrap: clusterv1.Bootstrap{
+							Bootstrap: v1beta1.Bootstrap{
 								DataSecretName: scw.StringPtr("bootstrap"),
 							},
 						},
-						Status: clusterv1.MachineStatus{
+						Status: v1beta1.MachineStatus{
 							NodeRef: &corev1.ObjectReference{
 								Name: "cluster",
 							},
@@ -674,12 +674,12 @@ func TestService_Delete(t *testing.T) {
 			name: "delete machine with additional block and local volumes",
 			fields: fields{
 				Machine: &scope.Machine{
-					Machine: &clusterv1.Machine{
+					Machine: &v1beta1.Machine{
 						ObjectMeta: metav1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: clusterv1.MachineSpec{
+						Spec: v1beta1.MachineSpec{
 							FailureDomain: scw.StringPtr("fr-par-1"),
 						},
 					},
