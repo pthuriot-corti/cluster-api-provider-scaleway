@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/onsi/gomega"	
-	infrav1 "github.com/scaleway/cluster-api-provider-scaleway/api/v1alpha1"
+	. "github.com/onsi/gomega"
+	"github.com/scaleway/cluster-api-provider-scaleway/api/v1alpha1"
 	"github.com/scaleway/cluster-api-provider-scaleway/internal/scope"
 	"github.com/scaleway/cluster-api-provider-scaleway/internal/service/scaleway/client"
 	"github.com/scaleway/cluster-api-provider-scaleway/internal/service/scaleway/client/mock_client"
@@ -90,40 +90,40 @@ func TestService_Reconcile(t *testing.T) {
 							},
 						},
 					},
-					ScalewayMachine: &infrav1.ScalewayMachine{
+					ScalewayMachine: &v1alpha1.ScalewayMachine{
 						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: infrav1.ScalewayMachineSpec{
+						Spec: v1alpha1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.ImageSpec{
+							Image: v1alpha1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							PublicNetwork: &infrav1.PublicNetworkSpec{
+							PublicNetwork: &v1alpha1.PublicNetworkSpec{
 								EnableIPv4: scw.BoolPtr(true),
 								EnableIPv6: scw.BoolPtr(true),
 							},
-							RootVolume: &infrav1.RootVolumeSpec{
+							RootVolume: &v1alpha1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &infrav1.ScalewayCluster{
+						ScalewayCluster: &v1alpha1.ScalewayCluster{
 							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: infrav1.ScalewayClusterSpec{
-								Network: &infrav1.NetworkSpec{
-									PrivateNetwork: &infrav1.PrivateNetworkSpec{
+							Spec: v1alpha1.ScalewayClusterSpec{
+								Network: &v1alpha1.NetworkSpec{
+									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: infrav1.ScalewayClusterStatus{
-								Network: &infrav1.NetworkStatus{
+							Status: v1alpha1.ScalewayClusterStatus{
+								Network: &v1alpha1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -248,20 +248,20 @@ func TestService_Reconcile(t *testing.T) {
 							},
 						},
 					},
-					ScalewayMachine: &infrav1.ScalewayMachine{
+					ScalewayMachine: &v1alpha1.ScalewayMachine{
 						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: infrav1.ScalewayMachineSpec{
+						Spec: v1alpha1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.ImageSpec{
+							Image: v1alpha1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							RootVolume: &infrav1.RootVolumeSpec{
+							RootVolume: &v1alpha1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
-							AdditionalVolumes: []infrav1.AdditionalVolume{
+							AdditionalVolumes: []v1alpha1.AdditionalVolume{
 								{Type: scw.StringPtr("block"), Size: scw.Int64Ptr(20), IOPS: scw.Int64Ptr(5000)},
 								{Type: scw.StringPtr("local"), Size: scw.Int64Ptr(10)},
 								{Type: scw.StringPtr("scratch"), Size: scw.Int64Ptr(50)},
@@ -269,20 +269,20 @@ func TestService_Reconcile(t *testing.T) {
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &infrav1.ScalewayCluster{
+						ScalewayCluster: &v1alpha1.ScalewayCluster{
 							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: infrav1.ScalewayClusterSpec{
-								Network: &infrav1.NetworkSpec{
-									PrivateNetwork: &infrav1.PrivateNetworkSpec{
+							Spec: v1alpha1.ScalewayClusterSpec{
+								Network: &v1alpha1.NetworkSpec{
+									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: infrav1.ScalewayClusterStatus{
-								Network: &infrav1.NetworkStatus{
+							Status: v1alpha1.ScalewayClusterStatus{
+								Network: &v1alpha1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -397,41 +397,41 @@ func TestService_Reconcile(t *testing.T) {
 							},
 						},
 					},
-					ScalewayMachine: &infrav1.ScalewayMachine{
+					ScalewayMachine: &v1alpha1.ScalewayMachine{
 						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: infrav1.ScalewayMachineSpec{
+						Spec: v1alpha1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.ImageSpec{
+							Image: v1alpha1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							PublicNetwork: &infrav1.PublicNetworkSpec{
+							PublicNetwork: &v1alpha1.PublicNetworkSpec{
 								EnableIPv4: scw.BoolPtr(true),
 								EnableIPv6: scw.BoolPtr(true),
 							},
-							RootVolume: &infrav1.RootVolumeSpec{
+							RootVolume: &v1alpha1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
 							ProviderID: scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111"),
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &infrav1.ScalewayCluster{
+						ScalewayCluster: &v1alpha1.ScalewayCluster{
 							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: infrav1.ScalewayClusterSpec{
-								Network: &infrav1.NetworkSpec{
-									PrivateNetwork: &infrav1.PrivateNetworkSpec{
+							Spec: v1alpha1.ScalewayClusterSpec{
+								Network: &v1alpha1.NetworkSpec{
+									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: infrav1.ScalewayClusterStatus{
-								Network: &infrav1.NetworkStatus{
+							Status: v1alpha1.ScalewayClusterStatus{
+								Network: &v1alpha1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -548,41 +548,41 @@ func TestService_Delete(t *testing.T) {
 							},
 						},
 					},
-					ScalewayMachine: &infrav1.ScalewayMachine{
+					ScalewayMachine: &v1alpha1.ScalewayMachine{
 						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: infrav1.ScalewayMachineSpec{
+						Spec: v1alpha1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.ImageSpec{
+							Image: v1alpha1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							PublicNetwork: &infrav1.PublicNetworkSpec{
+							PublicNetwork: &v1alpha1.PublicNetworkSpec{
 								EnableIPv4: scw.BoolPtr(true),
 								EnableIPv6: scw.BoolPtr(true),
 							},
-							RootVolume: &infrav1.RootVolumeSpec{
+							RootVolume: &v1alpha1.RootVolumeSpec{
 								Size: scw.Int64Ptr(42),
 							},
 							ProviderID: scw.StringPtr("scaleway://instance/fr-par-1/11111111-1111-1111-1111-111111111111"),
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &infrav1.ScalewayCluster{
+						ScalewayCluster: &v1alpha1.ScalewayCluster{
 							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
 							},
-							Spec: infrav1.ScalewayClusterSpec{
-								Network: &infrav1.NetworkSpec{
-									PrivateNetwork: &infrav1.PrivateNetworkSpec{
+							Spec: v1alpha1.ScalewayClusterSpec{
+								Network: &v1alpha1.NetworkSpec{
+									PrivateNetwork: &v1alpha1.PrivateNetworkSpec{
 										Enabled: true,
 									},
 								},
 							},
-							Status: infrav1.ScalewayClusterStatus{
-								Network: &infrav1.NetworkStatus{
+							Status: v1alpha1.ScalewayClusterStatus{
+								Network: &v1alpha1.NetworkStatus{
 									PrivateNetworkID: scw.StringPtr(privateNetworkID),
 								},
 							},
@@ -683,21 +683,21 @@ func TestService_Delete(t *testing.T) {
 							FailureDomain: scw.StringPtr("fr-par-1"),
 						},
 					},
-					ScalewayMachine: &infrav1.ScalewayMachine{
+					ScalewayMachine: &v1alpha1.ScalewayMachine{
 						ObjectMeta: v1.ObjectMeta{
 							Name:      "machine",
 							Namespace: "default",
 						},
-						Spec: infrav1.ScalewayMachineSpec{
+						Spec: v1alpha1.ScalewayMachineSpec{
 							CommercialType: "DEV1-S",
-							Image: infrav1.ImageSpec{
+							Image: v1alpha1.ImageSpec{
 								ID: scw.StringPtr(imageID),
 							},
-							RootVolume: &infrav1.RootVolumeSpec{
+							RootVolume: &v1alpha1.RootVolumeSpec{
 								Type: scw.StringPtr("local"),
 								Size: scw.Int64Ptr(42),
 							},
-							AdditionalVolumes: []infrav1.AdditionalVolume{
+							AdditionalVolumes: []v1alpha1.AdditionalVolume{
 								{Type: scw.StringPtr("block"), Size: scw.Int64Ptr(20), IOPS: scw.Int64Ptr(5000)},
 								{Type: scw.StringPtr("local"), Size: scw.Int64Ptr(10)},
 							},
@@ -705,7 +705,7 @@ func TestService_Delete(t *testing.T) {
 						},
 					},
 					Cluster: &scope.Cluster{
-						ScalewayCluster: &infrav1.ScalewayCluster{
+						ScalewayCluster: &v1alpha1.ScalewayCluster{
 							ObjectMeta: v1.ObjectMeta{
 								Name:      "cluster",
 								Namespace: "default",
